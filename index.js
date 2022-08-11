@@ -7,65 +7,52 @@ const {
     LAMPORTS_PER_SOL
 } = require("@solana/web3.js");
 
-// Create a new keypair
-const newPair = new Keypair();
+// Declare variable to store the input data from user
+const userPubKey = process.argv.slice(2);
 
-// Exact the public and private key from the keypair
-const publicKey = new PublicKey(newPair._keypair.publicKey).toString();
-const privateKey = newPair._keypair.secretKey;
 
 // Connect to the Devnet
 const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
-console.log("Public Key of the generated keypair", publicKey);
-
-// Get the wallet balance from a given private key
-const getWalletBalance = async (signature) => {
+// Get the wallet balance from a given public key
+const getWalletBalance = async () => {
     try {
         // Connect to the Devnet
         const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-        console.log("Connection object is:", connection);
+        //console.log("Connection object is:", connection);
 
-        // Make a wallet (keypair) from privateKey and get its balance
-        const myWallet = await Keypair.fromSecretKey(privateKey);
+        //Get its balance prior airdrop and after airdrop
         const walletBalance = await connection.getBalance(
-            new PublicKey(signature)
+            new PublicKey(userPubKey[0])
         );
         console.log(`Wallet balance: ${parseInt(walletBalance) / LAMPORTS_PER_SOL} SOL`);
     } catch (err) {
         console.log(err);
-    }    
-    
+    }
 };
 
-
-const airDropSol = async (signature) => {
+const airDropSol = async () => {
     try {
         // Connect to the Devnet and make a wallet from privateKey
         const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-        const myWallet = await Keypair.fromSecretKey(privateKey);
 
         // Request airdrop of 2 SOL to the wallet
-        console.log("Airdropping some SOL to my wallet!");
+        console.log("Airdropping to user\' wallet address...", userPubKey[0]);
         const fromAirDropSignature = await connection.requestAirdrop(
-            new PublicKey(signature),
+            new PublicKey(userPubKey[0]),
             2 * LAMPORTS_PER_SOL
         );
         await connection.confirmTransaction(fromAirDropSignature);
     } catch (err) {
         console.log(err);
-    }    
+    }
 };
 
 // Show the wallet balance before and after airdropping SOL
 const mainFunction = async () => {
-    var address = process.argv[2];
-      console.log("Target address", address)
-    if (address !=undefined) {  
-    await getWalletBalance(address);
-    await airDropSol(address);
-    await getWalletBalance(address);
-    }
+    await getWalletBalance();
+    await airDropSol();
+    await getWalletBalance();
 }
 
 mainFunction();
