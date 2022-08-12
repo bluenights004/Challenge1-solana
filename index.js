@@ -39,7 +39,7 @@ const airDropSol = async () => {
         const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
         // Request airdrop of 2 SOL to the wallet
-        console.log("Airdropping to user\' wallet address...", userPubKey[0]);
+        console.log("Airdropping to your wallet...", userPubKey);
         const fromAirDropSignature = await connection.requestAirdrop(
             new PublicKey(userPubKey),
             2 * LAMPORTS_PER_SOL
