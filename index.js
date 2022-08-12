@@ -8,7 +8,9 @@ const {
 } = require("@solana/web3.js");
 
 // Declare variable to store the input data from user
-const userPubKey = process.argv.slice(2);
+const ps = require("prompt-sync");
+const prompt = ps();
+let userPubKey = prompt("Enter your public key: ");
 
 
 // Connect to the Devnet
@@ -23,7 +25,7 @@ const getWalletBalance = async () => {
 
         //Get its balance prior airdrop and after airdrop
         const walletBalance = await connection.getBalance(
-            new PublicKey(userPubKey[0])
+            new PublicKey(userPubKey)
         );
         console.log(`Wallet balance: ${parseInt(walletBalance) / LAMPORTS_PER_SOL} SOL`);
     } catch (err) {
@@ -39,7 +41,7 @@ const airDropSol = async () => {
         // Request airdrop of 2 SOL to the wallet
         console.log("Airdropping to user\' wallet address...", userPubKey[0]);
         const fromAirDropSignature = await connection.requestAirdrop(
-            new PublicKey(userPubKey[0]),
+            new PublicKey(userPubKey),
             2 * LAMPORTS_PER_SOL
         );
         await connection.confirmTransaction(fromAirDropSignature);
